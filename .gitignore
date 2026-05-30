@@ -1,0 +1,21 @@
+#------------------------------------------------
+# © 2026 Remus Rigo
+#    2026-05-16
+#------------------------------------------------
+
+#My ignored files
+ToDo.*
+[Uu]pload.*
+*.psd
+
+#Delphi specific files & folders
+[Bb]in
+[Oo]bj
+__history
+__recovery
+*.dproj.local
+*.dsk
+*.dsv
+*.groupproj.local
+*.identcache
+*.tvsconfig

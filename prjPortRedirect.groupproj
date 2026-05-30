@@ -1,0 +1,36 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+    <PropertyGroup>
+        <ProjectGuid>{05A5691A-C555-40EF-AFEA-2D4C536F8539}</ProjectGuid>
+    </PropertyGroup>
+    <ItemGroup>
+        <Projects Include="PortRedirect.dproj">
+            <Dependencies/>
+        </Projects>
+    </ItemGroup>
+    <ProjectExtensions>
+        <Borland.Personality>Default.Personality.12</Borland.Personality>
+        <Borland.ProjectType/>
+        <BorlandProject>
+            <Default.Personality/>
+        </BorlandProject>
+    </ProjectExtensions>
+    <Target Name="PortRedirect">
+        <MSBuild Projects="PortRedirect.dproj"/>
+    </Target>
+    <Target Name="PortRedirect:Clean">
+        <MSBuild Projects="PortRedirect.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="PortRedirect:Make">
+        <MSBuild Projects="PortRedirect.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="Build">
+        <CallTarget Targets="PortRedirect"/>
+    </Target>
+    <Target Name="Clean">
+        <CallTarget Targets="PortRedirect:Clean"/>
+    </Target>
+    <Target Name="Make">
+        <CallTarget Targets="PortRedirect:Make"/>
+    </Target>
+    <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
+</Project>
