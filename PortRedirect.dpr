@@ -8,7 +8,8 @@ uses
   AppSettings in 'Units\AppSettings.pas',
   wndAbout in 'Forms\wndAbout.pas' {frmAbout},
   AppData in 'Units\AppData.pas',
-  SerialThread in 'Units\SerialThread.pas';
+  SerialCommunication in 'Units\SerialCommunication.pas',
+  COMSendData in 'Units\COMSendData.pas';
 
 {$R *.res}
 

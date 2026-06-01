@@ -7,7 +7,7 @@ uses
    System.SysUtils, System.Variants, System.Classes,
    Vcl.Graphics, Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls, System.ImageList,
    Vcl.ImgList, Vcl.ComCtrls, Vcl.ToolWin,
-   AppSettings, SerialThread,
+   AppSettings, SerialCommunication,
    wndSettings, wndAbout;
 
 const
@@ -44,7 +44,6 @@ type
          procedure CreateWnd; override;
          procedure WndProc(var Message: TMessage); override;
       private
-         FComHandle: THandle;
          Serial: TSerialThread;
          dcb: TDCB;
          AppSettings: TAppSettings;
@@ -57,6 +56,9 @@ var
 implementation
 
 {$R *.dfm}
+
+uses
+   COMSendData;
 
 //-------------------------------------------------------------------------------------------------
 // CreateWnd
@@ -124,37 +126,66 @@ begin
    FillChar(dcb, SizeOf(dcb), 0);
    dcb.DCBlength:=SizeOf(dcb);
 
-   dcb.BaudRate:=9600;
-   dcb.ByteSize:=8;
-   dcb.Parity:=NOPARITY;
-   dcb.StopBits:=ONESTOPBIT;
+   dcb.BaudRate:=AppSettings.BaudRate;
+   dcb.ByteSize:=AppSettings.DataBits;
+   dcb.Parity  :=AppSettings.Parity;
+   dcb.StopBits:=AppSettings.StopBits;
 
-// Required
-dcb.Flags := dcb.Flags or DCB_fBinary;
-//dcb.Flags := dcb.Flags or DCB_fParity;
+   case AppSettings.FlowControl of
+      0:
+      begin
+         dcb.Flags   :=dcb.Flags or DCB_fBinary;
+      end;
+
+      1:
+      begin
+         dcb.Flags := dcb.Flags or $00000004; // fOutxCtsFlow
+         dcb.Flags := dcb.Flags or (RTS_CONTROL_HANDSHAKE shl 12);
+      end;
+
+      2:
+      begin
+          dcb.Flags := dcb.Flags or $00000100; // fOutX
+         dcb.Flags := dcb.Flags or $00000200; // fInX
+      end;
+   end;
 {
-// Disable flow control
-dcb.Flags := dcb.Flags and not DCB_fOutxCtsFlow;
-dcb.Flags := dcb.Flags and not DCB_fOutxDsrFlow;
-dcb.Flags := dcb.Flags and not DCB_fOutX;
-dcb.Flags := dcb.Flags and not DCB_fInX;
+   // Required
+   dcb.Flags := dcb.Flags or DCB_fBinary;
+   dcb.Flags := dcb.Flags or DCB_fParity;
 
-// Enable RTS/DTR
-dcb.Flags := dcb.Flags or (DTR_CONTROL_ENABLE shl 4);  // fDtrControl bits
-dcb.Flags := dcb.Flags or (RTS_CONTROL_ENABLE shl 12); // fRtsControl bits
+   // Disable flow control
+   dcb.Flags := dcb.Flags and not DCB_fOutxCtsFlow;
+   dcb.Flags := dcb.Flags and not DCB_fOutxDsrFlow;
+   dcb.Flags := dcb.Flags and not DCB_fOutX;
+   dcb.Flags := dcb.Flags and not DCB_fInX;
 
-// No abort on error
-dcb.Flags := dcb.Flags and not DCB_fAbortOnError;
+   // Enable RTS/DTR
+   dcb.Flags := dcb.Flags or (DTR_CONTROL_ENABLE shl 4);  // fDtrControl bits
+   dcb.Flags := dcb.Flags or (RTS_CONTROL_ENABLE shl 12); // fRtsControl bits
+
+   // No abort on error
+   dcb.Flags := dcb.Flags and not DCB_fAbortOnError;
+
+   // RTS/CTS (Hardware)
+   dcb.Flags := dcb.Flags or $00000004; // fOutxCtsFlow = 1
+   dcb.Flags := dcb.Flags or (RTS_CONTROL_HANDSHAKE shl 12);
+
+   // XON/XOFF (Software)
+   dcb.Flags := dcb.Flags or $00000100; // fOutX = 1
+   dcb.Flags := dcb.Flags or $00000200; // fInX  = 1
+
  }
 
    Serial:=TSerialThread.Create(AppSettings.Port, dcb,
       procedure(const Data: string)
       begin
          MemoData.Lines.Add(Data);
+         SendTextByTitle('Untitled - Notepad', data);
       end
    );
 
-   StatusBar.SimpleText:=AppSettings.Port;
+   StatusBar.SimpleText:='Port: '+AppSettings.Port+'  Baud Rate: '+IntToStr(dcb.BaudRate);
 end;
 
 procedure TfrmPortRedirect.toolBtnSettingsClick(Sender: TObject);
@@ -167,6 +198,7 @@ begin
    finally
       frm.Free;
    end;
+   //toolBtnOpenClick(nil);
 end;
 
 end.

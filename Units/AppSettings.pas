@@ -11,20 +11,20 @@ const
 type
    TAppSettings = class
    private
-      _Port    : string;
-      _BaudRate: Integer;
-      _DataBits: Integer;
-      _Parity  : Integer;
-      _StopBits: Integer;
-      _Flags   : Integer;
+      _Port       : string;
+      _BaudRate   : Integer;
+      _DataBits   : Integer;
+      _Parity     : Integer;
+      _StopBits   : Integer;
+      _FlowControl: Integer;
       function GetSettingsFile: String;
    public
-      property Port: string read _Port write _Port;
-      property BaudRate: Integer read _BaudRate write _BaudRate;
-      property DataBits: Integer read _DataBits write _DataBits;
-      property Parity:   Integer read _Parity   write _Parity;
-      property StopBits: Integer read _StopBits write _StopBits;
-      property Flags:    Integer read _Flags    write _Flags;
+      property Port       : string  read _Port        write _Port;
+      property BaudRate   : Integer read _BaudRate    write _BaudRate;
+      property DataBits   : Integer read _DataBits    write _DataBits;
+      property Parity     : Integer read _Parity      write _Parity;
+      property StopBits   : Integer read _StopBits    write _StopBits;
+      property FlowControl: Integer read _FlowControl write _FlowControl;
       procedure LoadSettings;
       procedure SaveSettings;
    end;
@@ -43,33 +43,25 @@ end;
 // Load Settings from JSON file
 procedure TAppSettings.LoadSettings;
 var
-   jsonObj  : TJSONObject;
-   jsonData : string;
+   root, com  : TJSONObject;
+   jsonData: String;
 begin
-   // If file doesn't exist load defaults
-   if not TFile.Exists(GetSettingsFile) then
-   begin
-      _Port     := 'COM1';
-      _BaudRate := 9600;
-      _DataBits := 8;
-      _Parity   :=NOPARITY;
-      _StopBits :=ONESTOPBIT;
-      _Flags    :=DCB_BINARY;
-   end
-   else
-   begin
-      jsonData:=TFile.ReadAllText(GetSettingsFile);
-      jsonObj:=TJSONObject.ParseJSONValue(jsonData) as TJSONObject;
-      try
-         _Port    :=jsonObj.GetValue<string>('Port', 'COM1');
-         _BaudRate:=jsonObj.GetValue<Integer>('BaudRate', 9600);
-         _DataBits:=jsonObj.GetValue<Integer>('DataBits', 8);
-         _Parity  :=jsonObj.GetValue<Integer>('Parity', NOPARITY);
-         _StopBits:=jsonObj.GetValue<Integer>('StopBits', ONESTOPBIT);
-         _Flags   :=jsonObj.GetValue<Integer>('Flags', DCB_BINARY);
-      finally
-         jsonObj.Free;
+   jsonData:=TFile.ReadAllText(GetSettingsFile);
+   root:=TJSONObject.ParseJSONValue(jsonData) as TJSONObject;
+   if Assigned(root) then
+   try
+      com:=root.GetValue('Connection') as TJSONObject;
+      if Assigned(com) then
+      begin
+         _Port       :=com.GetValue<string>('Port', 'COM1');
+         _BaudRate   :=com.GetValue<Integer>('BaudRate', 9600);
+         _DataBits   :=com.GetValue<Integer>('DataBits', 8);
+         _Parity     :=com.GetValue<Integer>('Parity', 0);
+         _StopBits   :=com.GetValue<Integer>('StopBits', 1);
+         _FlowControl:=com.GetValue<Integer>('FlowControl', 0);
       end;
+   finally
+      root.Free;
    end;
 end;
 
@@ -77,20 +69,23 @@ end;
 // Save Settings to JSON file
 procedure TAppSettings.SaveSettings;
 var
-   jsonObj: TJSONObject;
+   root, com: TJSONObject;
 begin
-   jsonObj:=TJSONObject.Create;
+   com:=TJSONObject.Create;
+   root:=TJSONObject.Create;
    try
-      jsonObj.AddPair('Port', _Port);
-      jsonObj.AddPair('BaudRate', TJSONNumber.Create(_BaudRate));
-      jsonObj.AddPair('DataBits', TJSONNumber.Create(_DataBits));
-      jsonObj.AddPair('Parity',   TJSONNumber.Create(_Parity));
-      jsonObj.AddPair('StopBits', TJSONNumber.Create(_StopBits));
-      jsonObj.AddPair('Flags',    TJSONNumber.Create(_Flags));
+      com.AddPair('Port', _Port);
+      com.AddPair('BaudRate', TJSONNumber.Create(_BaudRate));
+      com.AddPair('DataBits', TJSONNumber.Create(_DataBits));
+      com.AddPair('Parity', TJSONNumber.Create(_Parity));
+      com.AddPair('StopBits', TJSONNumber.Create(_StopBits));
+      com.AddPair('FlowControl', TJSONNumber.Create(_FlowControl));
 
-      TFile.WriteAllText(GetSettingsFile, jsonObj.ToJSON);
+      root.AddPair('Connection', com);
+
+      TFile.WriteAllText(GetSettingsFile, root.Format(3));
    finally
-      jsonObj.Free;
+      root.Free; // frees com too
    end;
 end;
 

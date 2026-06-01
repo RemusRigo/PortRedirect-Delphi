@@ -31,6 +31,7 @@ Just run PortRedirect.exe
 
 ## Roadmap
 
+* 2026-06-01: Test: App Settings save to JSON complete
 * 2026-05-30: Add: Implement save and load settings to JSON file using AppSettings class
 * 2026-05-30: Add: Read data from COM port (tested)
 * 2026-05-30: Project started \[Delphi version]
