@@ -1,9 +1,9 @@
 object frmPortRedirect: TfrmPortRedirect
   Left = 0
   Top = 0
-  Caption = 'Port Redirect'
-  ClientHeight = 608
-  ClientWidth = 483
+  Caption = 'COM Redirect'
+  ClientHeight = 243
+  ClientWidth = 493
   Color = clBtnFace
   Font.Charset = DEFAULT_CHARSET
   Font.Color = clWindowText
@@ -1679,15 +1679,15 @@ object frmPortRedirect: TfrmPortRedirect
   object memoData: TMemo
     Left = 0
     Top = 29
-    Width = 483
-    Height = 560
+    Width = 493
+    Height = 195
     Align = alClient
     TabOrder = 0
   end
   object ToolBar1: TToolBar
     Left = 0
     Top = 0
-    Width = 483
+    Width = 493
     Height = 29
     Images = imgListButtons
     TabOrder = 1
@@ -1707,6 +1707,7 @@ object frmPortRedirect: TfrmPortRedirect
       AutoSize = True
       Caption = 'Close port'
       ImageIndex = 1
+      OnClick = toolBtnCloseClick
     end
     object toolBtnSettings: TToolButton
       AlignWithMargins = True
@@ -1720,8 +1721,8 @@ object frmPortRedirect: TfrmPortRedirect
   end
   object StatusBar: TStatusBar
     Left = 0
-    Top = 589
-    Width = 483
+    Top = 224
+    Width = 493
     Height = 19
     Panels = <>
     SimplePanel = True

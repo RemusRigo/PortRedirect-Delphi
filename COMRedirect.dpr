@@ -1,10 +1,9 @@
-program PortRedirect;
+program COMRedirect;
 
 uses
   Vcl.Forms,
   wndPortRedirect in 'Forms\wndPortRedirect.pas' {frmPortRedirect},
   wndSettings in 'Forms\wndSettings.pas' {frmSettings},
-  wndLog in 'Forms\wndLog.pas' {frmLog},
   AppSettings in 'Units\AppSettings.pas',
   wndAbout in 'Forms\wndAbout.pas' {frmAbout},
   AppData in 'Units\AppData.pas',
@@ -18,7 +17,6 @@ begin
   Application.MainFormOnTaskbar := True;
   Application.CreateForm(TfrmPortRedirect, frmPortRedirect);
   Application.CreateForm(TfrmSettings, frmSettings);
-  Application.CreateForm(TfrmLog, frmLog);
   Application.CreateForm(TfrmAbout, frmAbout);
   Application.Run;
 end.

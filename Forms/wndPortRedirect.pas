@@ -40,6 +40,7 @@ type
       procedure FormShow(Sender: TObject);
     procedure toolBtnSettingsClick(Sender: TObject);
     procedure FormClose(Sender: TObject; var Action: TCloseAction);
+    procedure toolBtnCloseClick(Sender: TObject);
       protected
          procedure CreateWnd; override;
          procedure WndProc(var Message: TMessage); override;
@@ -58,7 +59,22 @@ implementation
 {$R *.dfm}
 
 uses
-   COMSendData;
+   AppData, COMSendData;
+
+//-------------------------------------------------------------------------------------------------
+// SendKeys
+procedure SendKeys(const S: string);
+var
+  i: Integer;
+  c: Char;
+begin
+   for i:=1 to Length(S) do
+   begin
+      c:=S[i];
+      keybd_event(VkKeyScan(c), 0, 0, 0);
+      keybd_event(VkKeyScan(c), 0, KEYEVENTF_KEYUP, 0);
+   end;
+end;
 
 //-------------------------------------------------------------------------------------------------
 // CreateWnd
@@ -67,9 +83,9 @@ var
    hSysMenu: HMENU;
 begin
    inherited;
-   hSysMenu := GetSystemMenu(Handle, False);
+   hSysMenu:=GetSystemMenu(Handle, False);
    AppendMenu(hSysMenu, MF_SEPARATOR, 0, nil);
-   AppendMenu(hSysMenu, MF_STRING,    SYSMENU_ABOUT_ID, 'About...');
+   AppendMenu(hSysMenu, MF_STRING, SYSMENU_ABOUT_ID, 'About');
 end;
 
 //-------------------------------------------------------------------------------------------------
@@ -90,14 +106,21 @@ begin
          end;
       end;
 end;
+
+//-------------------------------------------------------------------------------------------------
+// frmPortRedirect onShow
 procedure TfrmPortRedirect.FormShow(Sender: TObject);
 begin
+   Self.Caption:=appCaption;
+
    AppSettings:=TAppSettings.Create;
    AppSettings.LoadSettings;
 
    toolBtnOpenClick(nil);
 end;
 
+//-------------------------------------------------------------------------------------------------
+// frmPortRedirect onClose
 procedure TfrmPortRedirect.FormClose(Sender: TObject; var Action: TCloseAction);
 begin
    if Assigned(Serial) then
@@ -111,8 +134,11 @@ begin
    AppSettings:=nil;
 end;
 
+//-------------------------------------------------------------------------------------------------
+// toolBtnOpen onClick
 procedure TfrmPortRedirect.toolBtnOpenClick(Sender: TObject);
 begin
+
    // Prevent multiple threads
    if Assigned(Serial) then
    begin
@@ -134,63 +160,64 @@ begin
    case AppSettings.FlowControl of
       0:
       begin
-         dcb.Flags   :=dcb.Flags or DCB_fBinary;
+         dcb.Flags:=dcb.Flags or DCB_fBinary;
       end;
 
       1:
       begin
-         dcb.Flags := dcb.Flags or $00000004; // fOutxCtsFlow
-         dcb.Flags := dcb.Flags or (RTS_CONTROL_HANDSHAKE shl 12);
+         dcb.Flags:=dcb.Flags or $00000004; // fOutxCtsFlow
+         dcb.Flags:=dcb.Flags or (RTS_CONTROL_HANDSHAKE shl 12);
       end;
 
       2:
       begin
-          dcb.Flags := dcb.Flags or $00000100; // fOutX
-         dcb.Flags := dcb.Flags or $00000200; // fInX
+         dcb.Flags:=dcb.Flags or $00000100; // fOutX
+         dcb.Flags:=dcb.Flags or $00000200; // fInX
       end;
    end;
-{
-   // Required
-   dcb.Flags := dcb.Flags or DCB_fBinary;
-   dcb.Flags := dcb.Flags or DCB_fParity;
-
-   // Disable flow control
-   dcb.Flags := dcb.Flags and not DCB_fOutxCtsFlow;
-   dcb.Flags := dcb.Flags and not DCB_fOutxDsrFlow;
-   dcb.Flags := dcb.Flags and not DCB_fOutX;
-   dcb.Flags := dcb.Flags and not DCB_fInX;
-
-   // Enable RTS/DTR
-   dcb.Flags := dcb.Flags or (DTR_CONTROL_ENABLE shl 4);  // fDtrControl bits
-   dcb.Flags := dcb.Flags or (RTS_CONTROL_ENABLE shl 12); // fRtsControl bits
-
-   // No abort on error
-   dcb.Flags := dcb.Flags and not DCB_fAbortOnError;
-
-   // RTS/CTS (Hardware)
-   dcb.Flags := dcb.Flags or $00000004; // fOutxCtsFlow = 1
-   dcb.Flags := dcb.Flags or (RTS_CONTROL_HANDSHAKE shl 12);
-
-   // XON/XOFF (Software)
-   dcb.Flags := dcb.Flags or $00000100; // fOutX = 1
-   dcb.Flags := dcb.Flags or $00000200; // fInX  = 1
-
- }
 
    Serial:=TSerialThread.Create(AppSettings.Port, dcb,
       procedure(const Data: string)
+      var
+         hwndApp: HWND;
       begin
          MemoData.Lines.Add(Data);
-         SendTextByTitle('Untitled - Notepad', data);
+
+         TThread.Queue(nil,
+            procedure
+            begin
+               hwndApp:=FindWindow(nil, PWideChar(AppSettings.WindowTitle));
+               if hwndApp <> 0 then
+               begin
+                  SetForegroundWindow(hwndApp);
+                  Sleep(200);
+                  SendKeys(data);
+               end;
+            end);
+
       end
    );
-
    StatusBar.SimpleText:='Port: '+AppSettings.Port+'  Baud Rate: '+IntToStr(dcb.BaudRate);
 end;
 
+//-------------------------------------------------------------------------------------------------
+// toolBtnStop onClick
+procedure TfrmPortRedirect.toolBtnCloseClick(Sender: TObject);
+begin
+   if Assigned(Serial) then
+   begin
+      Serial.Stop;
+      Serial.WaitFor;
+      Serial.Free;
+      Serial:=nil;
+   end;
+end;
+
+//-------------------------------------------------------------------------------------------------
+// toolBtnSettings onClick
 procedure TfrmPortRedirect.toolBtnSettingsClick(Sender: TObject);
 var
-  frm: TfrmSettings;
+   frm: TfrmSettings;
 begin
    frm:=TfrmSettings.Create(Self);
    try
@@ -198,7 +225,6 @@ begin
    finally
       frm.Free;
    end;
-   //toolBtnOpenClick(nil);
 end;
 
 end.

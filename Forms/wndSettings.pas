@@ -24,6 +24,8 @@ type
     cbStopBits: TComboBox;
     lblFlowControl: TLabel;
     cbFlowControl: TComboBox;
+    cbAppTitle: TComboBox;
+    lblAppTitle: TLabel;
       procedure FormShow(Sender: TObject);
       procedure FormClose(Sender: TObject; var Action: TCloseAction);
    private
@@ -105,6 +107,7 @@ begin
    cbParity.Text:=IntToStr(AppSettings.Parity);
    cbStopBits.Text:=IntToStr(AppSettings.StopBits);
    cbFlowControl.ItemIndex:=AppSettings.FlowControl;
+   cbAppTitle.Text:=AppSettings.WindowTitle;
 end;
 
 procedure TfrmSettings.FormClose(Sender: TObject; var Action: TCloseAction);
@@ -115,6 +118,7 @@ begin
    AppSettings.Parity     :=StrToInt(cbParity.Text);
    AppSettings.StopBits   :=StrToInt(cbStopBits.Text);
    AppSettings.FlowControl:=cbFlowControl.ItemIndex;
+   AppSettings.WindowTitle:=cbAppTitle.Text;
 
    AppSettings.SaveSettings;
    AppSettings.Free;
