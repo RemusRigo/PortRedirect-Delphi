@@ -1,2 +1,2 @@
-
+* stop when cable unplug
 
