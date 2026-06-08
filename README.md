@@ -1,6 +1,6 @@
-# COM Redirect
+# Port Redirect
 
-A Windows COM Port Redirect utility
+A Windows Port Redirect utility
 
 
 
@@ -13,7 +13,7 @@ A Windows COM Port Redirect utility
 
 ## Installation
 
-Just run COMRedirect.exe
+Just run PortRedirect.exe
 
 
 
@@ -27,7 +27,7 @@ Just run COMRedirect.exe
 
 ## Statistics
 
-![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/comRedirect-Delphi/total)
+!\[GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/PortRedirect-Delphi/total)
 
 
 
@@ -38,4 +38,5 @@ Just run COMRedirect.exe
 * 2026-06-01: Test: App Settings save to JSON complete
 * 2026-05-30: Add: Implement save and load settings to JSON file using AppSettings class
 * 2026-05-30: Add: Read data from COM port (tested)
-* 2026-05-30: Project started \[Delphi version]
+* 2026-05-30: Project started
+
