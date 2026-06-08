@@ -1,4 +1,4 @@
-program COMRedirect;
+program PortRedirect;
 
 uses
   Vcl.Forms,

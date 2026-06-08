@@ -10,8 +10,8 @@ unit AppData;
 interface
 
 const
-   appCaption = 'COM Redirect v1.0 by Remus Rigo';
-   appName = 'COM Redirect';
+   appCaption = 'Port Redirect v1.0 by Remus Rigo';
+   appName = 'Port Redirect';
    appVer = 'v1.0 2026-06-02';
    appAuth = '© 2026 Remus Rigo';
 

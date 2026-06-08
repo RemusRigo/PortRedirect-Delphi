@@ -1,7 +1,7 @@
 object frmPortRedirect: TfrmPortRedirect
   Left = 0
   Top = 0
-  Caption = 'COM Redirect'
+  Caption = 'Port Redirect'
   ClientHeight = 243
   ClientWidth = 493
   Color = clBtnFace

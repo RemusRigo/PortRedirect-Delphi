@@ -1,14 +1,24 @@
 #------------------------------------------------
 # © 2026 Remus Rigo
-#    2026-05-30
+#    2026-06-01
 #------------------------------------------------
 
-#My ignored files
-[Uu]pdate.*
+#------------------------------------------------
+# My ignored files
+#
 [Uu]pload.*
+[Uu]pdate.*
 *.psd
 
-#Delphi specific files & folders
+#------------------------------------------------
+# Windows ignored files
+#
+[Dd]esktop.ini
+[Tt]humbs.db
+
+#------------------------------------------------
+# Delphi ignored files
+#
 [Bb]in
 [Oo]bj
 __history
