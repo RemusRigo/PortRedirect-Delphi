@@ -27,7 +27,7 @@ Just run PortRedirect.exe
 
 ## Statistics
 
-!\[GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/PortRedirect-Delphi/total)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/RemusRigo/PortRedirect-Delphi/total)
 
 
 
