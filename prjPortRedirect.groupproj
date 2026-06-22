@@ -3,7 +3,7 @@
         <ProjectGuid>{05A5691A-C555-40EF-AFEA-2D4C536F8539}</ProjectGuid>
     </PropertyGroup>
     <ItemGroup>
-        <Projects Include="PortRedirect.dproj">
+        <Projects Include="PortRedirect\PortRedirect.dproj">
             <Dependencies/>
         </Projects>
     </ItemGroup>
@@ -15,13 +15,13 @@
         </BorlandProject>
     </ProjectExtensions>
     <Target Name="PortRedirect">
-        <MSBuild Projects="PortRedirect.dproj"/>
+        <MSBuild Projects="PortRedirect\PortRedirect.dproj"/>
     </Target>
     <Target Name="PortRedirect:Clean">
-        <MSBuild Projects="PortRedirect.dproj" Targets="Clean"/>
+        <MSBuild Projects="PortRedirect\PortRedirect.dproj" Targets="Clean"/>
     </Target>
     <Target Name="PortRedirect:Make">
-        <MSBuild Projects="PortRedirect.dproj" Targets="Make"/>
+        <MSBuild Projects="PortRedirect\PortRedirect.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
         <CallTarget Targets="PortRedirect"/>
